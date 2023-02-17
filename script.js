@@ -21,11 +21,6 @@ const gameBoard = (() => {
     });
   };
 
-  const findCellByIndex = (index) => {
-    const cellsArr = Array.from(document.querySelectorAll('.cell'));
-    return cellsArr[index];
-  };
-
   const findCellByElement = (element) => {
     const cellsArr = Array.from(document.querySelectorAll('.cell'));
     return cellsArr.indexOf(element);
@@ -52,7 +47,7 @@ const gameBoard = (() => {
       // console.log(`checkWin ${activeMark()}`);
       const mark = activeMark();
       const winConditions = [
-        [0, 2, 4],
+        [0, 3, 6],
         [1, 4, 7],
         [2, 5, 8],
         [0, 1, 2],
@@ -72,12 +67,20 @@ const gameBoard = (() => {
       }
       return false;
     };
+    const checkDraw = () => {
+      if (board.includes('') === false && checkWin() === false) {
+        move.innerHTML = 'It\'s Draw!';
+        return true;
+      }
+      return false;
+    };
     return {
       one,
       two,
       switchPlayer,
       activeMark,
       checkWin,
+      checkDraw,
     };
   };
 
@@ -93,7 +96,6 @@ const gameBoard = (() => {
   return {
     board,
     renderBoard,
-    findCellByIndex,
     findCellByElement,
     createPlayer,
     putMark,
@@ -105,20 +107,49 @@ const gameBoard = (() => {
 
 const displayModule = (() => {
   const cells = document.querySelectorAll('.cell');
-  const player = gameBoard.createPlayer();
+  const nameOne = document.querySelector('#play1').value;
+  const nameTwo = document.querySelector('#play2').value;
+  console.log('stworzono gracza');
+  const player = gameBoard.createPlayer(nameOne, nameTwo);
   const cellClick = (e) => {
     const index = e.target;
     const activeMark = player.activeMark();
     // console.log(`test ${index.innerHTML}`);
     if (index.innerHTML === '') {
       // console.log('puste');
+      console.log(nameOne);
       gameBoard.putMark(index, activeMark);
       gameBoard.renderBoard();
-      if (player.checkWin() !== true) {
+      if (player.checkWin() === true) {
         // console.log('test');
+        // player.checkWin();
+      } else {
         player.switchPlayer();
+      }
+      if (player.checkDraw() === true) {
+        return 0;
       }
     }
   };
-  cells.forEach((e) => e.addEventListener('click', cellClick));
+  const startGame = () => {
+    cells.forEach((e) => e.addEventListener('click', cellClick));
+  };
+  return {
+    cellClick, startGame,
+  };
 })();
+
+// gamestart
+const gameStart = (() => {
+  const start = () => {
+    const startButton = document.querySelector('#startButton');
+    startButton.addEventListener('click', (event) => {
+      console.log('test');
+      // displayModule.cellClick();
+      displayModule.startGame();
+      event.preventDefault();
+    });
+  };
+  return { start };
+})();
+gameStart.start();
