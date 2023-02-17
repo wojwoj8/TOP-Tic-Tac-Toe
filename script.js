@@ -50,7 +50,7 @@ const gameBoard = (() => {
     };
     const checkWin = () => {
       // console.log(`checkWin ${activeMark()}`);
-
+      const mark = activeMark();
       const winConditions = [
         [0, 2, 4],
         [1, 4, 7],
@@ -61,6 +61,16 @@ const gameBoard = (() => {
         [0, 4, 8],
         [2, 4, 6],
       ];
+      for (let i = 0; i < winConditions.length; i++) {
+        const condition = winConditions[i];
+        if (board[condition[0]] === mark && board[condition[1]] === mark
+          && board[condition[2]] === mark) {
+          console.log(`Player with ${mark} wins`);
+          move.innerHTML = `Player with ${mark} wins`;
+          return true;
+        }
+      }
+      return false;
     };
     return {
       one,
@@ -101,10 +111,13 @@ const displayModule = (() => {
     const activeMark = player.activeMark();
     // console.log(`test ${index.innerHTML}`);
     if (index.innerHTML === '') {
-      console.log('puste');
+      // console.log('puste');
       gameBoard.putMark(index, activeMark);
       gameBoard.renderBoard();
-      player.switchPlayer();
+      if (player.checkWin() !== true) {
+        // console.log('test');
+        player.switchPlayer();
+      }
     }
   };
   cells.forEach((e) => e.addEventListener('click', cellClick));
