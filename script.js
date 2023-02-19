@@ -26,7 +26,7 @@ const gameBoard = (() => {
       board[index] = '';
       // cell.innerHTML = board[index];
       // console.log(cell);
-      console.log(board[index]);
+      // console.log(board[index]);
     });
   };
 
@@ -44,6 +44,7 @@ const gameBoard = (() => {
     // console.log(`active player ${activePlayer}`);
 
     const switchPlayer = () => {
+      // console.log(activePlayer);
       activePlayer = activePlayer === 'X' ? 'O' : 'X';
       // move.innerHTML = `It's ${activePlayer} move`;
     };
@@ -69,7 +70,7 @@ const gameBoard = (() => {
         const condition = winConditions[i];
         if (board[condition[0]] === mark && board[condition[1]] === mark
           && board[condition[2]] === mark) {
-          console.log(`Player with ${mark} wins`);
+          // console.log(`Player with ${mark} wins`);
           // move.innerHTML = `Player with ${mark} wins`;
           return true;
         }
@@ -123,21 +124,26 @@ const displayModule = (() => {
   const move = document.querySelector('#playerMove');
   const restartButton = document.querySelector('#restartButton');
 
+  let gameOver = false;
   const getPlayerNames = () => {
     let nameOne = document.querySelector('#play1').value;
     let nameTwo = document.querySelector('#play2').value;
     if (nameOne === '') {
-      nameOne = 'Paul';
+      nameOne = document.querySelector('#play1').placeholder;
     }
     if (nameTwo === '') {
-      nameTwo = 'Bob';
+      nameTwo = document.querySelector('#play2').placeholder;
     }
     player.one = gameBoard.createPlayer(nameOne, 'X');
     player.two = gameBoard.createPlayer(nameTwo, 'O');
   };
   const cellClick = (e) => {
+    if (gameOver) {
+      return;
+    }
     const index = e.target;
     const activeMark = player.activeMark();
+    // console.log(activeMark);
     // console.log(`test ${index.innerHTML}`);
     if (index.innerHTML === '') {
       // console.log('puste');
@@ -153,6 +159,7 @@ const displayModule = (() => {
           move.innerHTML = `${player.two.one.getName()} won!`;
         }
         restartButton.style.display = 'flex';
+        gameOver = true;
       } else {
         player.switchPlayer();
         if (activeMark === player.one.one.getMark()) {
@@ -163,11 +170,18 @@ const displayModule = (() => {
       }
       if (player.checkDraw() === true) {
         restartButton.style.display = 'flex';
+        gameOver = true;
       }
     }
   };
   const startGame = () => {
     getPlayerNames();
+    // console.log('zaczeto gre');
+    gameOver = false;
+    // console.log(player);
+    if (player.activeMark() === 'O') {
+      player.switchPlayer();
+    }
     cells.forEach((e) => e.addEventListener('click', cellClick));
   };
   return {
@@ -175,7 +189,7 @@ const displayModule = (() => {
   };
 })();
 
-// gamestart
+// gameController
 const gameController = (() => {
   const move = document.querySelector('#playerMove');
   const playersName = document.querySelector('.playersName');
@@ -193,14 +207,12 @@ const gameController = (() => {
   const restart = () => {
     const restartButton = document.querySelector('#restartButton');
     restartButton.addEventListener('click', () => {
-      gameBoard.board = ['', '', '', '', '', '', '', '', ''];
-      console.log(gameBoard.board);
+      // console.log(gameBoard.board);
       gameBoard.renderBoard();
       gameBoard.clearBoard();
       playersName.style.display = 'flex';
       restartButton.style.display = 'none';
       move.innerHTML = 'It\'s X move';
-      gameController.start();
     });
   };
   return { start, restart };
