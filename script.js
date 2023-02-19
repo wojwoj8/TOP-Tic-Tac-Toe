@@ -20,6 +20,15 @@ const gameBoard = (() => {
       cell.innerHTML = board[index];
     });
   };
+  const clearBoard = () => {
+    cells.forEach((cell, index) => {
+      cell.innerHTML = '';
+      board[index] = '';
+      // cell.innerHTML = board[index];
+      // console.log(cell);
+      console.log(board[index]);
+    });
+  };
 
   const findCellByElement = (element) => {
     const cellsArr = Array.from(document.querySelectorAll('.cell'));
@@ -36,7 +45,7 @@ const gameBoard = (() => {
 
     const switchPlayer = () => {
       activePlayer = activePlayer === 'X' ? 'O' : 'X';
-      move.innerHTML = `It's ${activePlayer} move`;
+      // move.innerHTML = `It's ${activePlayer} move`;
     };
     const activeMark = () => {
       const mark = activePlayer;
@@ -61,7 +70,7 @@ const gameBoard = (() => {
         if (board[condition[0]] === mark && board[condition[1]] === mark
           && board[condition[2]] === mark) {
           console.log(`Player with ${mark} wins`);
-          move.innerHTML = `Player with ${mark} wins`;
+          // move.innerHTML = `Player with ${mark} wins`;
           return true;
         }
       }
@@ -74,7 +83,9 @@ const gameBoard = (() => {
       }
       return false;
     };
+    const players = [one, two];
     return {
+      players,
       one,
       two,
       switchPlayer,
@@ -99,6 +110,7 @@ const gameBoard = (() => {
     findCellByElement,
     createPlayer,
     putMark,
+    clearBoard,
 
   };
 })();
@@ -107,31 +119,55 @@ const gameBoard = (() => {
 
 const displayModule = (() => {
   const cells = document.querySelectorAll('.cell');
-  const nameOne = document.querySelector('#play1').value;
-  const nameTwo = document.querySelector('#play2').value;
-  console.log('stworzono gracza');
-  const player = gameBoard.createPlayer(nameOne, nameTwo);
+  const player = gameBoard.createPlayer('', '');
+  const move = document.querySelector('#playerMove');
+  const restartButton = document.querySelector('#restartButton');
+
+  const getPlayerNames = () => {
+    let nameOne = document.querySelector('#play1').value;
+    let nameTwo = document.querySelector('#play2').value;
+    if (nameOne === '') {
+      nameOne = 'Paul';
+    }
+    if (nameTwo === '') {
+      nameTwo = 'Bob';
+    }
+    player.one = gameBoard.createPlayer(nameOne, 'X');
+    player.two = gameBoard.createPlayer(nameTwo, 'O');
+  };
   const cellClick = (e) => {
     const index = e.target;
     const activeMark = player.activeMark();
     // console.log(`test ${index.innerHTML}`);
     if (index.innerHTML === '') {
       // console.log('puste');
-      console.log(nameOne);
+      // console.log(nameOne);
+      // console.log(player.one.one.getName());
+      // console.log(player.two.one.getName());
       gameBoard.putMark(index, activeMark);
       gameBoard.renderBoard();
       if (player.checkWin() === true) {
-        // console.log('test');
-        // player.checkWin();
+        if (activeMark === player.one.one.getMark()) {
+          move.innerHTML = `${player.one.one.getName()} won!`;
+        } else {
+          move.innerHTML = `${player.two.one.getName()} won!`;
+        }
+        restartButton.style.display = 'flex';
       } else {
         player.switchPlayer();
+        if (activeMark === player.one.one.getMark()) {
+          move.innerHTML = `It\`s ${player.two.one.getName()} move!`;
+        } else {
+          move.innerHTML = `It\`s ${player.one.one.getName()} move!`;
+        }
       }
       if (player.checkDraw() === true) {
-        return 0;
+        restartButton.style.display = 'flex';
       }
     }
   };
   const startGame = () => {
+    getPlayerNames();
     cells.forEach((e) => e.addEventListener('click', cellClick));
   };
   return {
@@ -140,16 +176,35 @@ const displayModule = (() => {
 })();
 
 // gamestart
-const gameStart = (() => {
+const gameController = (() => {
+  const move = document.querySelector('#playerMove');
+  const playersName = document.querySelector('.playersName');
   const start = () => {
     const startButton = document.querySelector('#startButton');
+    // const playersName = document.querySelector('.playersName');
     startButton.addEventListener('click', (event) => {
-      console.log('test');
+      // console.log('test');
       // displayModule.cellClick();
       displayModule.startGame();
+      playersName.style.display = 'none';
       event.preventDefault();
     });
   };
-  return { start };
+  const restart = () => {
+    const restartButton = document.querySelector('#restartButton');
+    restartButton.addEventListener('click', () => {
+      gameBoard.board = ['', '', '', '', '', '', '', '', ''];
+      console.log(gameBoard.board);
+      gameBoard.renderBoard();
+      gameBoard.clearBoard();
+      playersName.style.display = 'flex';
+      restartButton.style.display = 'none';
+      move.innerHTML = 'It\'s X move';
+      gameController.start();
+    });
+  };
+  return { start, restart };
 })();
-gameStart.start();
+
+gameController.start();
+gameController.restart();

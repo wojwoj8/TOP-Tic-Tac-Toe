@@ -35,3 +35,13 @@ h1 {
   flex-direction: column;
   margin-bottom:10px;
 }
+.playersName{
+  display:flex;
+  flex-direction: column;
+}
+#restartButton{
+  display:none;
+  justify-content: center !important;
+  margin-bottom: 10px;
+  
+}
